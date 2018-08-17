@@ -1,0 +1,34 @@
+---
+# tasks file for ansible-role-ohpc-setup
+
+- name: install OpenHPC base, warewulf, and slurm server
+  yum: name={{ item }} state=present
+  with_items:
+    - "ohpc-base"
+    - "ohpc-warewulf"
+
+- name: config warewulf interface
+  lineinfile: dest=/etc/warewulf/provision.conf regexp="network device =" line="network device = {{ internal_interface }}" 
+
+- name: enable tftp
+  lineinfile: dest=/etc/xinetd.d/tftp regexp="^(\s+)disable(\s+)= yes" line="\1disable\2= no" backrefs=yes
+  notify: restart xinetd
+
+- name: exportfs opt entry on headnode
+  lineinfile: line="/opt/ohpc/pub {{ internal_net }}(ro,no_subtree_check,fsid=11)" dest=/etc/exports state=present
+  notify: restart nfs
+
+- name: initialize database
+  command: wwinit database
+
+- name: cluster ssh keys
+  command: wwinit ssh_keys
+  args:
+    chdir: /root/
+    creates: /etc/warewulf/vnfs/ssh/ssh_host_key.pub
+
+- name: Generate ww chroot images
+  command: wwmkchroot centos-7 {{ item }}
+  delegate_to: localhost
+  with_items: "{{ groups.compute_ohpc }}"
+
