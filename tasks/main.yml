@@ -29,6 +29,27 @@
 
 - name: Generate ww chroot images
   command: wwmkchroot centos-7 {{ item }}
-  delegate_to: localhost
-  with_items: "{{ groups.compute_ohpc }}"
+  #delegate_to: localhost
+  with_items: "{{ groups.ohpc_images }}"
 
+- name: upgrade all packages in OpenHPC images
+  yum:
+    name: '*'
+    state: latest
+    installroot: "{{ item }}"
+  with_items: "{{ groups.ohpc_images }}"
+
+- name: Install OpenHPC client packages and yum to ww image chroot(s)
+  yum:
+    name: "{{ packages }}"
+    state: present
+    installroot: "{{ item }}"
+  vars:
+    packages:
+      - ohpc-base-compute
+      - yum
+  with_items: "{{ groups.ohpc_images }}"
+
+- name: Copy resolv.conf to ww image chroots
+  copy: src=/etc/resolv.conf dest={{ item }}/etc/resolv.conf owner=root mode=0644
+  with_items: "{{ groups.ohpc_images }}"
