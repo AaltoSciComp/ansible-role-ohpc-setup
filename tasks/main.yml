@@ -40,6 +40,7 @@
 
 - name: Make sure chroot images have /dev/urandom
   command: mknod {{ item }}/dev/urandom c 1 9
+  creates: {{ item }}/dev/urandom
   with_items: "{{ groups.ohpc_images }}"
 
 - name: upgrade all packages in OpenHPC images
