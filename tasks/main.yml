@@ -32,6 +32,16 @@
   #delegate_to: localhost
   with_items: "{{ groups.ohpc_images }}"
 
+# Fixed in ohpc 1.3.6
+# https://github.com/openhpc/ohpc/commit/371d8787438ab54cc129a8b71952e75aa55c7e8d
+- name: Make sure chroot images have /dev
+  command: mkdir -p {{ item }}/dev
+  with_items: "{{ groups.ohpc_images }}"
+
+- name: Make sure chroot images have /dev/urandom
+  command: mknod {{ item }}/dev/urandom c 1 9
+  with_items: "{{ groups.ohpc_images }}"
+
 - name: upgrade all packages in OpenHPC images
   yum:
     name: '*'
