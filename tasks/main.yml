@@ -14,19 +14,19 @@
 - name: Don't exclude entire /var/log
   lineinfile:
     path: /etc/warewulf/vnfs.conf
-    regexp: "exclude += /var/log/\*"
+    regexp: '^exclude \+= /var/log/\*'
     state: absent
 
 - name: Exclude /var/log/yum.log
   lineinfile:
     path: /etc/warewulf/vnfs.conf
-    regexp: "exclude += /var/log/yum.log"
+    line: 'exclude += /var/log/yum.log'
     state: present
 
 - name: Exclude /var/log/lastlog
   lineinfile:
     path: /etc/warewulf/vnfs.conf
-    regexp: "exclude += /var/log/lastlog"
+    line: 'exclude += /var/log/lastlog'
     state: present
 
 - name: enable tftp
