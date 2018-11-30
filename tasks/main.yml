@@ -11,6 +11,24 @@
 - name: config warewulf interface
   lineinfile: dest=/etc/warewulf/provision.conf regexp="network device =" line="network device = {{ internal_interface }}" 
 
+- name: Don't exclude entire /var/log
+  lineinfile:
+    path: /etc/warewulf/vnfs.conf
+    regexp: "exclude += /var/log/\*"
+    state: absent
+
+- name: Exclude /var/log/yum.log
+  lineinfile:
+    path: /etc/warewulf/vnfs.conf
+    regexp: "exclude += /var/log/yum.log"
+    state: present
+
+- name: Exclude /var/log/lastlog
+  lineinfile:
+    path: /etc/warewulf/vnfs.conf
+    regexp: "exclude += /var/log/lastlog"
+    state: present
+
 - name: enable tftp
   lineinfile: dest=/etc/xinetd.d/tftp regexp="^(\s+)disable(\s+)= yes" line="\1disable\2= no" backrefs=yes
   notify: restart xinetd
