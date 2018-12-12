@@ -87,3 +87,13 @@
 - name: Copy resolv.conf to ww image chroots
   copy: src=/etc/resolv.conf dest={{ item }}/etc/resolv.conf owner=root mode=0644
   with_items: "{{ groups.ohpc_images }}"
+
+- name: Make sure local dir exists on image
+  file:
+    path: "{{ item }}{{ ohpc_node_local_dir }}"
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+  with_items: "{{ groups.ohpc_images }}"
+  when: ohpc_node_local_dir != ""

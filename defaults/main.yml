@@ -1,2 +1,5 @@
 ---
 # defaults file for ansible-role-ohpc-setup
+
+# Local work directory in images
+ohpc_node_local_dir: ""
