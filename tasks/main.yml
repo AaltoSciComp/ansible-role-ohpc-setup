@@ -84,6 +84,14 @@
       - yum
   with_items: "{{ groups.ohpc_images }}"
 
+- name: Install grub2 to stateful images
+  yum:
+    name: grub2
+    state: present
+    installroot: "{{ item }}"
+  when: hostvars[item]['stateful'] is defined
+  with_items: "{{ groups.ohpc_images }}"
+
 - name: Copy resolv.conf to ww image chroots
   copy: src=/etc/resolv.conf dest={{ item }}/etc/resolv.conf owner=root mode=0644
   with_items: "{{ groups.ohpc_images }}"
