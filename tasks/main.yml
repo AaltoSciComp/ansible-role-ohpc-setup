@@ -11,7 +11,7 @@
 - name: config warewulf interface
   lineinfile: dest=/etc/warewulf/provision.conf regexp="network device =" line="network device = {{ internal_interface }}" 
 
-- name: Don't exclude entire /var/log
+- name: Do not exclude entire /var/log
   lineinfile:
     path: /etc/warewulf/vnfs.conf
     regexp: '^exclude \+= /var/log/\*'
