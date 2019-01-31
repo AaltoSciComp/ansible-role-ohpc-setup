@@ -60,6 +60,12 @@
     mode: 0755
   with_items: "{{ groups.ohpc_images }}"
 
+- name: Make sure chroot images have /dev/urandom
+  command: mknod {{ item }}/dev/urandom c 1 9
+  args:
+    creates: "{{ item }}/dev/urandom"
+  with_items: "{{ groups.ohpc_images }}"
+
 # Install only needed locales
 # https://bugzilla.redhat.com/show_bug.cgi?id=156477
 - name: Install only needed locales
@@ -71,12 +77,6 @@
     mode: 0644
   notify: reinstall glibc-common
   loop: "{{ groups.ohpc_images }}"
-
-- name: Make sure chroot images have /dev/urandom
-  command: mknod {{ item }}/dev/urandom c 1 9
-  args:
-    creates: "{{ item }}/dev/urandom"
-  with_items: "{{ groups.ohpc_images }}"
 
 - name: upgrade all packages in OpenHPC images
   yum:
