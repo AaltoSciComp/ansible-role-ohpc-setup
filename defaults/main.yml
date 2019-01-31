@@ -3,3 +3,6 @@
 
 # Local work directory in images
 ohpc_node_local_dir: ""
+
+# List of locales to generate when installing rpm's
+ohpc_rpm_macros_install_langs: "en_US.utf8:en_DK.utf8:fi_FI.utf8:sv_FI.utf8"

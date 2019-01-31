@@ -16,3 +16,6 @@
   listen: restart nfs
   service: name=nfs-server state=restarted enabled=yes
 
+- name: reinstall glibc-common
+  command: yum -y --installroot={{ item }} reinstall glibc-common
+  loop: "{{ groups.ohpc_images }}"
