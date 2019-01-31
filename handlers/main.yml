@@ -16,6 +16,7 @@
   listen: restart nfs
   service: name=nfs-server state=restarted enabled=yes
 
+# For some reason yum --installroot doesn't work here
 - name: reinstall glibc-common
-  command: yum -y --installroot={{ item }} reinstall glibc-common
+  command: chroot {{ item}} yum -y reinstall glibc-common
   loop: "{{ groups.ohpc_images }}"
