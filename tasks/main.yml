@@ -49,7 +49,7 @@
 - name: Generate ww chroot images
   command: wwmkchroot centos-7 {{ item }}
   #delegate_to: localhost
-  with_items: "{{ groups.ohpc_images }}"
+  loop: "{{ groups.ohpc_images }}"
 
 # Fixed in ohpc 1.3.6
 # https://github.com/openhpc/ohpc/commit/371d8787438ab54cc129a8b71952e75aa55c7e8d
@@ -58,13 +58,13 @@
     path: "{{ item }}/dev"
     state: directory
     mode: 0755
-  with_items: "{{ groups.ohpc_images }}"
+  loop: "{{ groups.ohpc_images }}"
 
 - name: Make sure chroot images have /dev/urandom
   command: mknod {{ item }}/dev/urandom c 1 9
   args:
     creates: "{{ item }}/dev/urandom"
-  with_items: "{{ groups.ohpc_images }}"
+  loop: "{{ groups.ohpc_images }}"
 
 # Install only needed locales
 # https://bugzilla.redhat.com/show_bug.cgi?id=156477
@@ -83,7 +83,7 @@
     name: '*'
     state: latest
     installroot: "{{ item }}"
-  with_items: "{{ groups.ohpc_images }}"
+  loop: "{{ groups.ohpc_images }}"
 
 - name: Install OpenHPC client packages and yum to ww image chroot(s)
   yum:
@@ -94,7 +94,7 @@
     packages:
       - ohpc-base-compute
       - yum
-  with_items: "{{ groups.ohpc_images }}"
+  loop: "{{ groups.ohpc_images }}"
 
 - name: Install grub2 to stateful images
   yum:
@@ -102,11 +102,11 @@
     state: present
     installroot: "{{ item }}"
   when: hostvars[item]['stateful'] is defined
-  with_items: "{{ groups.ohpc_images }}"
+  loop: "{{ groups.ohpc_images }}"
 
 - name: Copy resolv.conf to ww image chroots
   copy: src=/etc/resolv.conf dest={{ item }}/etc/resolv.conf owner=root mode=0644
-  with_items: "{{ groups.ohpc_images }}"
+  loop: "{{ groups.ohpc_images }}"
 
 - name: Make sure local dir exists on image
   file:
@@ -115,5 +115,5 @@
     mode: 0755
     owner: root
     group: root
-  with_items: "{{ groups.ohpc_images }}"
+  loop: "{{ groups.ohpc_images }}"
   when: ohpc_node_local_dir != ""
