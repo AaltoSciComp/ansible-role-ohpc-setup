@@ -29,9 +29,15 @@
     line: 'exclude += /var/log/lastlog'
     state: present
 
+- name: check if /etc/xinetd.d/tftp exists
+  stat:
+    path: /etc/xinetd.d/tftp
+  register: xinetd_tftp
+
 - name: enable tftp
   lineinfile: dest=/etc/xinetd.d/tftp regexp="^(\s+)disable(\s+)= yes" line="\1disable\2= no" backrefs=yes
   notify: restart xinetd
+  when: xinetd_tftp.stat.exists
 
 - name: exportfs opt entry on headnode
   lineinfile: line="/opt/ohpc/pub {{ internal_net }}(ro,no_subtree_check,fsid=11)" dest=/etc/exports state=present
