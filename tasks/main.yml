@@ -9,7 +9,10 @@
     state: present
 
 - name: config warewulf interface
-  lineinfile: dest=/etc/warewulf/provision.conf regexp="network device =" line="network device = {{ internal_interface }}" 
+  lineinfile:
+    dest: /etc/warewulf/provision.conf
+    regexp: "network device ="
+    line: "network device = {{ internal_interface }}"
 
 - name: Do not exclude entire /var/log
   lineinfile:
@@ -35,12 +38,19 @@
   register: xinetd_tftp
 
 - name: enable tftp
-  lineinfile: dest=/etc/xinetd.d/tftp regexp="^(\s+)disable(\s+)= yes" line="\1disable\2= no" backrefs=yes
+  lineinfile:
+    dest: /etc/xinetd.d/tftp
+    regexp: ^(\s*)disable(\s*)=(\s*)yes
+    line: \1disable\2=\3no
+    backrefs: yes
   notify: restart xinetd
   when: xinetd_tftp.stat.exists
 
 - name: exportfs opt entry on headnode
-  lineinfile: line="/opt/ohpc/pub {{ internal_net }}(ro,no_subtree_check,fsid=11)" dest=/etc/exports state=present
+  lineinfile:
+    line: /opt/ohpc/pub {{ internal_net }}(ro,no_subtree_check,fsid=11)
+    dest: /etc/exports
+    state: present
   notify: restart nfs
 
 - name: initialize database
@@ -111,7 +121,11 @@
   loop: "{{ groups.ohpc_images }}"
 
 - name: Copy resolv.conf to ww image chroots
-  copy: src=/etc/resolv.conf dest={{ item }}/etc/resolv.conf owner=root mode=0644
+  copy:
+    src: /etc/resolv.conf
+    dest: "{{ item }}/etc/resolv.conf"
+    owner: root
+    mode: 0644
   loop: "{{ groups.ohpc_images }}"
 
 - name: Make sure local dir exists on image
