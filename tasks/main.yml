@@ -1,6 +1,13 @@
 ---
 # tasks file for ansible-role-ohpc-setup
 
+- name: Add the OS specific varibles
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+
 - name: install OpenHPC base, warewulf, and slurm server
   package:
     name:
@@ -63,7 +70,7 @@
     creates: /etc/warewulf/vnfs/ssh/ssh_host_rsa_key.pub
 
 - name: Generate ww chroot images
-  command: wwmkchroot centos-7 {{ item }}
+  command: wwmkchroot {{ chroot_image }} {{ item }}
   #delegate_to: localhost
   loop: "{{ groups.ohpc_images }}"
 
