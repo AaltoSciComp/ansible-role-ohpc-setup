@@ -20,3 +20,10 @@
 - name: reinstall glibc-common
   command: chroot {{ item}} yum -y reinstall glibc-common
   loop: "{{ groups.ohpc_images }}"
+
+
+- name: restart tftp
+  systemd:
+    name: "{{ tftp_service }}"
+    daemon-reload: true
+    state: restarted

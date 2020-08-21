@@ -1,0 +1,33 @@
+---
+
+# using https://github.com/bertvv/ansible-role-tftp as a template for tftp setup on CentOS8
+
+- name: Install packages
+  package:
+    name: "{{ item }}"
+    state: installed
+  with_items: "{{ tftp_packages }}"
+
+- name: Ensure tftp root directory exists
+  file:
+    path: "{{ tftp_root_directory }}"
+    state: directory
+    owner: 'root'
+    group: 'root'
+    mode: '0755'
+    setype: 'tftpdir_rw_t'
+
+- name: Install configuration file
+  template:
+    dest: "{{ tftp_config }}"
+    src: systemd_tftp.service.j2
+  notify:
+    - restart tftp
+
+- name: Ensure service is started
+  service:
+    name: "{{ tftp_service }}"
+    state: started
+    enabled: true
+
+

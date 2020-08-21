@@ -1,0 +1,16 @@
+---
+
+# enable tftp for CentOS7
+- name: check if /etc/xinetd.d/tftp exists
+  stat:
+    path: /etc/xinetd.d/tftp
+  register: xinetd_tftp
+
+- name: enable tftp
+  lineinfile:
+    dest: /etc/xinetd.d/tftp
+    regexp: ^(\s*)disable(\s*)=(\s*)yes
+    line: \1disable\2=\3no
+    backrefs: yes
+  notify: restart xinetd
+  when: xinetd_tftp.stat.exists

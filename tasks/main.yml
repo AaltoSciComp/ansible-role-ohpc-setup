@@ -5,8 +5,15 @@
   include_vars: "{{ item }}"
   with_first_found:
     - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
-    - "{{ ansible_distribution }}.yml"
     - "{{ ansible_os_family }}.yml"
+
+# some functionality differs significantly between distributions. Separating to differents files altogether
+- include_tasks: redhat7.yml
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version == "7"
+
+- include_tasks: redhat8.yml
+  when: ansible_os_family == "RedHat" and ansible_distribution_major_version == "8"
+
 
 - name: install OpenHPC base, warewulf, and slurm server
   package:
@@ -39,20 +46,6 @@
     line: 'exclude += /var/log/lastlog'
     state: present
 
-- name: check if /etc/xinetd.d/tftp exists
-  stat:
-    path: /etc/xinetd.d/tftp
-  register: xinetd_tftp
-
-- name: enable tftp
-  lineinfile:
-    dest: /etc/xinetd.d/tftp
-    regexp: ^(\s*)disable(\s*)=(\s*)yes
-    line: \1disable\2=\3no
-    backrefs: yes
-  notify: restart xinetd
-  when: xinetd_tftp.stat.exists
-
 - name: exportfs opt entry on headnode
   lineinfile:
     line: /opt/ohpc/pub {{ internal_net }}(ro,no_subtree_check,fsid=11)
@@ -71,7 +64,6 @@
 
 - name: Generate ww chroot images
   command: wwmkchroot {{ chroot_image }} {{ item }}
-  #delegate_to: localhost
   loop: "{{ groups.ohpc_images }}"
 
 # Fixed in ohpc 1.3.6
@@ -101,6 +93,8 @@
   notify: reinstall glibc-common
   loop: "{{ groups.ohpc_images }}"
 
+
+# keeping yum for now. When deprecating CentOS7, update this to dnf
 - name: upgrade all packages in OpenHPC images
   yum:
     name: '*'
