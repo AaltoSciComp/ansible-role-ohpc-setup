@@ -5,6 +5,7 @@ chroot_image: centos-8
 tftp_packages:
   - policycoreutils-python-utils
   - tftp-server
+  - systemd-container
 
 tftp_service: tftp.socket
 
